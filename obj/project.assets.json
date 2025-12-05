@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\etechas\\Desktop\\MidasBlazor\\midasblazor.csproj",
+      "projectUniqueName": "E:\\2DS\\MidasBlazor\\midasblazor.csproj",
       "projectName": "midasblazor",
-      "projectPath": "C:\\Users\\etechas\\Desktop\\MidasBlazor\\midasblazor.csproj",
+      "projectPath": "E:\\2DS\\MidasBlazor\\midasblazor.csproj",
       "packagesPath": "D:\\NugetPackages",
-      "outputPath": "C:\\Users\\etechas\\Desktop\\MidasBlazor\\obj\\",
+      "outputPath": "E:\\2DS\\MidasBlazor\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

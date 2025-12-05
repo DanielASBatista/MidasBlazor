@@ -1,0 +1,67 @@
+﻿@page "/Projecoes"
+@rendermode InteractiveServer
+@inject MidasBlazor.Services.ProjecoesService ProjecoesService
+@using MidasBlazor.Models
+@using MidasBlazor.Services
+<PageTitle>Projeções</PageTitle>
+<h1>Projeções</h1>
+<p>Listagem de Projeções</p>
+<NavLink class="btn btn-info" href="/personagens/cadastro">
+<i class="bi bi-plus-lg"></i> Novo
+</NavLink>
+@if (lista == null)
+{
+<p><em>Carregando...</em></p>
+}
+else
+{
+<table class="table">
+<thead>
+<tr>
+<th>Id</th>
+<th>Descrição:</th>
+<th>Valor:</th>
+<th>Data</th>
+</tr>
+</thead>
+<tbody>
+@foreach (var projecoes in lista)
+{
+<tr>
+<td>@projecoes.IdProjecao</td>
+<td>@projecoes.Titulo</td>
+<td>@projecoes.ValorPrevisto</td>
+<td>@projecoes.DataReferencia</td>
+</tr>
+}
+</tbody>
+</table>
+}
+
+@code {
+
+    private List<ProjecaoViewModel> lista = null;
+    private string mensagem = string.Empty;
+    private string mensagemErro = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await CarregarPersonagens();
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensagemErro = ex.Message;
+        }
+    }
+
+    private async Task CarregarPersonagens()
+    {
+        lista = await ProjecoesService.GetAllAsync();
+    }
+}

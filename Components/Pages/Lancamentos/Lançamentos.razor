@@ -1,0 +1,67 @@
+﻿@page "/Lancamento"
+@rendermode InteractiveServer
+@inject MidasBlazor.Services.LancamentoService LancamentoService
+@using MidasBlazor.Models
+@using MidasBlazor.Services
+<PageTitle>Lançamentos</PageTitle>
+<h1>Lançamentos</h1>
+<p>Listagem de Lançamentos</p>
+<NavLink class="btn btn-info" href="/personagens/cadastro">
+<i class="bi bi-plus-lg"></i> Novo
+</NavLink>
+@if (lista == null)
+{
+<p><em>Carregando...</em></p>
+}
+else
+{
+<table class="table">
+<thead>
+<tr>
+<th>Id</th>
+<th>Descrição:</th>
+<th>Valor:</th>
+<th>Data</th>
+</tr>
+</thead>
+<tbody>
+@foreach (var lançamentos in lista)
+{
+<tr>
+<td>@lançamentos.IdLancamento</td>
+<td>@lançamentos.Descricao</td>
+<td>@lançamentos.Valor</td>
+<td>@lançamentos.Data</td>
+</tr>
+}
+</tbody>
+</table>
+}
+
+@code {
+
+    private List<LancamentoViewModel> lista = null;
+    private string mensagem = string.Empty;
+    private string mensagemErro = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await CarregarPersonagens();
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensagemErro = ex.Message;
+        }
+    }
+
+    private async Task CarregarPersonagens()
+    {
+        lista = await LancamentoService.GetAllAsync();
+    }
+}
