@@ -16,7 +16,7 @@ namespace MidasBlazor.Services
             _http = http;
         }
 
-        public async Task<ProjetoViewModel> InsertAsync(ProjetoViewModel projeto)
+      public async Task<ProjetoViewModel> InsertAsync(ProjetoViewModel projeto)
 {
     var content = new StringContent(
         JsonSerializer.Serialize(projeto),
@@ -24,7 +24,8 @@ namespace MidasBlazor.Services
         "application/json"
     );
 
-    // ROTA CORRETA
+    
+    // Endpoint correto
     var response = await _http.PostAsync("Projecoes", content);
 
     var responseContent = await response.Content.ReadAsStringAsync();
@@ -32,15 +33,55 @@ namespace MidasBlazor.Services
     if (!response.IsSuccessStatusCode)
         throw new Exception($"Erro ao inserir: {responseContent}");
 
-    // Aqui retorna o JSON da API
-    var projecaoCriada = JsonSerializer.Deserialize<ProjetoViewModel>(responseContent,
-        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+    // Deserializa o JSON retornado
+    var projecaoCriada = JsonSerializer.Deserialize<ProjetoViewModel>(
+        responseContent,
+        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+    );
 
-    // Atualiza o ID retornado
+    if (projecaoCriada == null)
+        throw new Exception("A API retornou um JSON inválido.");
+
+    // Atribui o ID retornado
     projeto.IdProjecao = projecaoCriada.IdProjecao;
 
     return projeto;
 }
+    // GET ALL
+    public async Task<List<ProjetoViewModel>> GetAllAsync()
+    {
+        var result = await _http.GetFromJsonAsync<List<ProjetoViewModel>>("Projecoes");
+
+
+        return result ?? new List<ProjetoViewModel>();
+    }
+    public async Task UpdateAsync(ProjetoViewModel projeto)
+    {
+        var content = new StringContent(
+            JsonSerializer.Serialize(projeto),
+            Encoding.UTF8,
+            "application/json"
+        );
+
+        var response = await _http.PutAsync($"Projecoes/{projeto.IdProjecao}", content);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var erro = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Erro ao atualizar: {erro}");
+        }
+    }
+    public async Task DeleteAsync(int id)
+    {
+        var response = await _http.DeleteAsync($"Projecoes/{id}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var erro = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Erro ao deletar: {erro}");
+        }
+    }
+
 
     }
 }

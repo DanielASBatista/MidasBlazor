@@ -1,0 +1,153 @@
+@page "/weather/Listas"
+@rendermode InteractiveServer
+@using MidasBlazor.Models
+@using MidasBlazor.Services
+@inject ProjetoService ProjetoService
+
+<h3>Gerenciar Projeções</h3>
+
+<EditForm Model="@projecao" OnValidSubmit="Salvar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Título</label>
+        <InputText class="form-control" @bind-Value="projecao.Titulo" />
+    </div>
+
+    <div class="mb-3">
+        <label>Valor Previsto</label>
+        <InputNumber class="form-control" @bind-Value="projecao.ValorPrevisto" />
+    </div>
+
+    <div class="mb-3">
+        <label>Data Referência</label>
+        <InputDate class="form-control" @bind-Value="projecao.DataReferencia" />
+    </div>
+
+    <button class="btn btn-primary">Salvar</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(mensagem))
+{
+    <div class="alert alert-success mt-3">@mensagem</div>
+}
+
+@if (!string.IsNullOrEmpty(mensagemErro))
+{
+    <div class="alert alert-danger mt-3">@mensagemErro</div>
+}
+
+<hr />
+
+<h4>Projeções Cadastradas</h4>
+
+@if (lista is null)
+{
+    <p>Carregando...</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Valor</th>
+                <th>Data</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in lista)
+            {
+                <tr>
+                    <td>@item.IdProjecao</td>
+                    <td>@item.Titulo</td>
+                    <td>@item.ValorPrevisto</td>
+                    <td>@item.DataReferencia.ToShortDateString()</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm"
+                                @onclick="() => Editar(item)">
+                            Editar
+                        </button>
+
+                        <button class="btn btn-danger btn-sm ms-2"
+                                @onclick="() => Excluir(item.IdProjecao)">
+                            Excluir
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<ProjetoViewModel>? lista;
+    private ProjetoViewModel projecao = new();
+
+    private string mensagem = "";
+    private string mensagemErro = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        lista = await ProjetoService.GetAllAsync();
+    }
+
+    private void Editar(ProjetoViewModel item)
+    {
+        projecao = new ProjetoViewModel
+        {
+            IdProjecao = item.IdProjecao,
+            Titulo = item.Titulo,
+            ValorPrevisto = item.ValorPrevisto,
+            DataReferencia = item.DataReferencia
+        };
+    }
+
+    private async Task Salvar()
+    {
+        try
+        {
+            if (projecao.IdProjecao == 0)
+            {
+                // INSERT
+                await ProjetoService.InsertAsync(projecao);
+                mensagem = "Projeção criada com sucesso!";
+            }
+            else
+            {
+                // UPDATE
+                await ProjetoService.UpdateAsync(projecao);
+                mensagem = "Projeção atualizada com sucesso!";
+            }
+
+            mensagemErro = "";
+            projecao = new();
+            lista = await ProjetoService.GetAllAsync(); // recarrega tabela
+        }
+        catch (Exception ex)
+        {
+            mensagem = "";
+            mensagemErro = ex.Message;
+        }
+    }
+
+    private async Task Excluir(int id)
+    {
+        try
+        {
+            await ProjetoService.DeleteAsync(id);
+
+            lista = await ProjetoService.GetAllAsync();
+            mensagem = "Projeção excluída!";
+            mensagemErro = "";
+        }
+        catch (Exception ex)
+        {
+            mensagemErro = ex.Message;
+        }
+    }
+}

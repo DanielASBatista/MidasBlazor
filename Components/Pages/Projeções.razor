@@ -1,12 +1,10 @@
 ﻿@page "/weather"
 @rendermode InteractiveServer
-@using Blazored.LocalStorage;
 @using MidasBlazor.Models
 @using MidasBlazor.Services
 @inject ProjetoService ProjetoService
-@inject ILocalStorageService LocalStorage
 
-<h3>Criar Nova Projeção</h3>
+<h3>Criar / Editar Projeção</h3>
 
 <EditForm Model="@projecao" OnValidSubmit="Salvar">
     <DataAnnotationsValidator />
@@ -28,6 +26,15 @@
     </div>
 
     <button class="btn btn-primary">Salvar</button>
+    <a class="btn btn-secondary mb-3" href="/weather/Listas">
+    Ver lista de projeções
+</a>
+
+
+    @if (projecao.IdProjecao > 0)
+    {
+        <button class="btn btn-warning ms-2" @onclick="Deletar">Excluir</button>
+    }
 </EditForm>
 
 @if (!string.IsNullOrEmpty(mensagem))
@@ -49,15 +56,42 @@
     {
         try
         {
-            
+            if (projecao.IdProjecao == 0)
+            {
+                // INSERT
+                await ProjetoService.InsertAsync(projecao);
+                mensagem = "Projeção criada com sucesso!";
+            }
+            else
+            {
+                // UPDATE
+                await ProjetoService.UpdateAsync(projecao);
+                mensagem = "Projeção atualizada!";
+            }
 
-            await ProjetoService.InsertAsync(projecao);
-
-            mensagem = "Projeção salva com sucesso!";
-            projecao = new(); // limpa formulário
+            mensagemErro = "";
+            projecao = new(); 
         }
         catch (Exception ex)
         {
+            mensagem = "";
+            mensagemErro = ex.Message;
+        }
+    }
+
+    private async Task Deletar()
+    {
+        try
+        {
+            await ProjetoService.DeleteAsync(projecao.IdProjecao);
+
+            mensagem = "Projeção excluída!";
+            mensagemErro = "";
+            projecao = new();
+        }
+        catch (Exception ex)
+        {
+            mensagem = "";
             mensagemErro = ex.Message;
         }
     }
