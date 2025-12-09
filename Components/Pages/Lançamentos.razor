@@ -1,8 +1,67 @@
-﻿@page "/counter"
+﻿@page "/Lancamento"
 @rendermode InteractiveServer
-
-@using MidasBlazor.Models  
-
+@inject MidasBlazor.Services.LancamentoService LancamentoService
+@using MidasBlazor.Models
+@using MidasBlazor.Services
 <PageTitle>Lançamentos</PageTitle>
+<EditForm Model="@lancamento" OnValidSubmit="Salvar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
+    <div class="mb-3">
+        <label>Título</label>
+        <InputText class="form-control" @bind-Value="projecao.Titulo" />
+    </div>
+
+    <div class="mb-3">
+        <label>Valor Previsto</label>
+        <InputNumber class="form-control" @bind-Value="projecao.ValorPrevisto" />
+    </div>
+
+    <div class="mb-3">
+        <label>Data Referência</label>
+        <InputDate class="form-control" @bind-Value="projecao.DataReferencia" />
+    </div>
+
+    <button class="btn btn-primary">Salvar</button>
+    <a class="btn btn-secondary mb-3" href="/Projecoes/GetAll">
+    Ver lista de projeções
+</a>
+
+
+    @if (projecao.IdProjecao > 0)
+    {
+        <button class="btn btn-warning ms-2" @onclick="Deletar">Excluir</button>
+    }
+</EditForm>
+
+
+
+@code {
+
+    private LancamentoViewModel lancamento = new();
+    private string mensagem = string.Empty;
+    private string mensagemErro = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                await CarregarLancamentos();
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            mensagemErro = ex.Message;
+        }
+    }
+
+    private async Task CarregarLancamentos()
+    {
+        lista = await LancamentoService.GetAllAsync();
+    }
+}
 

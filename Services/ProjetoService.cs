@@ -50,7 +50,7 @@ namespace MidasBlazor.Services
     // GET ALL
     public async Task<List<ProjetoViewModel>> GetAllAsync()
     {
-        var result = await _http.GetFromJsonAsync<List<ProjetoViewModel>>("Projecoes");
+        var result = await _http.GetFromJsonAsync<List<ProjetoViewModel>>("Projecoes/GetAll");
 
 
         return result ?? new List<ProjetoViewModel>();
