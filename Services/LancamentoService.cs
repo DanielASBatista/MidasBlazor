@@ -26,7 +26,7 @@ namespace MidasBlazor.Services
                 "application/json"
             );
 
-            var response = await _http.PostAsync("Lancamentos", content);
+            var response = await _http.PostAsync("Lancamentos/new", content);
 
             var responseContent = await response.Content.ReadAsStringAsync();
 
