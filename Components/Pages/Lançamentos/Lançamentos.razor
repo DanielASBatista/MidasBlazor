@@ -1,0 +1,97 @@
+﻿@page "/lancamentos"
+@rendermode InteractiveServer
+
+@using MidasBlazor.Models
+@using MidasBlazor.Services
+@inject LancamentoService LancamentoService
+
+<h3>Criar / Editar Lançamento</h3>
+
+<EditForm Model="@lancamento" OnValidSubmit="Salvar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Descrição</label>
+        <InputText class="form-control" @bind-Value="lancamento.Descricao" />
+    </div>
+
+    <div class="mb-3">
+        <label>Valor</label>
+        <InputNumber class="form-control" @bind-Value="lancamento.Valor" />
+    </div>
+
+    <div class="mb-3">
+        <label>Data</label>
+        <InputDate class="form-control" @bind-Value="lancamento.Data" />
+    </div>
+
+    <button class="btn btn-primary">Salvar</button>
+
+    <a class="btn btn-secondary ms-2" href="/Lancamentos/GetAll">
+        Ver lista de lançamentos
+    </a>
+
+    @if (lancamento.IdLancamento > 0)
+    {
+        <button class="btn btn-warning ms-2" @onclick="Deletar">Excluir</button>
+    }
+</EditForm>
+
+@if (!string.IsNullOrEmpty(mensagem))
+{
+    <div class="alert alert-success mt-3">@mensagem</div>
+}
+
+@if (!string.IsNullOrEmpty(mensagemErro))
+{
+    <div class="alert alert-danger mt-3">@mensagemErro</div>
+}
+
+@code 
+{
+    private LancamentoViewModel lancamento = new();
+    private string mensagem = "";
+    private string mensagemErro = "";
+
+    private async Task Salvar()
+    {
+        try
+        {
+            if (lancamento.IdLancamento == 0)
+            {
+                await LancamentoService.InsertAsync(lancamento);
+                mensagem = "Lançamento criado com sucesso!";
+            }
+            else
+            {
+                await LancamentoService.UpdateAsync(lancamento);
+                mensagem = "Lançamento atualizado!";
+            }
+
+            mensagemErro = "";
+            lancamento = new();
+        }
+        catch (Exception ex)
+        {
+            mensagem = "";
+            mensagemErro = ex.Message;
+        }
+    }
+
+    private async Task Deletar()
+    {
+        try
+        {
+            await LancamentoService.DeleteAsync(lancamento.IdLancamento);
+            mensagem = "Lançamento excluído!";
+            mensagemErro = "";
+            lancamento = new();
+        }
+        catch (Exception ex)
+        {
+            mensagem = "";
+            mensagemErro = ex.Message;
+        }
+    }
+}

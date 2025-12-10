@@ -8,19 +8,25 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddBlazoredLocalStorage();
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+    
 
 builder.Services.AddScoped<ProjetoService>();
+builder.Services.AddScoped<LancamentoService>(); 
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoLocal")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ConexaoAzure")));
 
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("http://localhost:5059/") // sua API
+    BaseAddress = new Uri("https://projetomidas.azurewebsites.net/")
 });
+
+
 var app = builder.Build();
+
 
 if (!app.Environment.IsDevelopment())
 {
@@ -33,6 +39,7 @@ app.UseHttpsRedirection();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
