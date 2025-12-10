@@ -26,7 +26,7 @@ namespace MidasBlazor.Services
 
     
     // Endpoint correto
-    var response = await _http.PostAsync("Projecoes", content);
+    var response = await _http.PostAsync("Projecoes/new", content);
 
     var responseContent = await response.Content.ReadAsStringAsync();
 
